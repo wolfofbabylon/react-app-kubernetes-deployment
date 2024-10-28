@@ -14,7 +14,12 @@ pipeline {
         git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/wolfofbabylon/react-app-kubernetes-deployment.git'
       }
     }
-
+    
+    stage('Initialize'){
+        def dockerHome = tool 'myDocker'
+        env.PATH = "${dockerHome}/bin:${env.PATH}"
+    }
+    
     stage('Build image') {
       steps{
         script {
