@@ -1,5 +1,4 @@
 pipeline {
-
   environment {
     dockerimagename = "bravinwasike/react-app"
     dockerImage = ""
@@ -7,58 +6,57 @@ pipeline {
 
   agent any
 
-  stages {
+  tools {
+    docker 'myDocker' // Configure Docker tool globally
+  }
 
+  stages {
     stage('Checkout Source') {
       steps {
         git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/wolfofbabylon/react-app-kubernetes-deployment.git'
       }
     }
-    
-    stage('Initialize'){
-        def dockerHome = tool 'myDocker'
-        env.PATH = "${dockerHome}/bin:${env.PATH}"
-    }
-    
-    stage('Build image') {
-      steps{
+
+    stage('Build Image') {
+      steps {
         script {
-          dockerImage = docker.build dockerimagename
+          dockerImage = docker.build(dockerimagename)
         }
       }
     }
 
-    stage('Pushing Image') {
+    stage('Push Image') {
       environment {
-               registryCredential = 'dockerhub-credentials'
-           }
-      steps{
+        registryCredential = 'dockerhub-credentials'
+      }
+      steps {
         script {
-          docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) {
-            dockerImage.push("latest")
+          docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+            dockerImage.push('latest')
           }
         }
       }
     }
 
-    stage('Deploying React.js container to Kubernetes') {
+    stage('Deploy to Kubernetes') {
       steps {
         script {
-          kubernetesDeploy(configs: "deployment.yaml", "service.yaml")
+          kubernetesDeploy(kubeconfigId: 'kubeconfig-credentials', configs: ["deployment.yaml", "service.yaml"])
         }
       }
     }
-
   }
 
+  post {
+    always {
+      script {
+        dockerImage?.with {
+          println("Cleaning up Docker image")
+          it.remove()
+        }
+      }
+      cleanWs() // Clean workspace after build
+    }
+  }
 }
-
-
-
-
-
-
-
-
-
 
