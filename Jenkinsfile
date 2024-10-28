@@ -7,7 +7,7 @@ pipeline {
   agent any
 
   tools {
-    docker 'myDocker' // Configure Docker tool globally
+    dockerTool 'myDocker' // Use dockerTool instead of docker to configure Docker
   }
 
   stages {
@@ -59,4 +59,3 @@ pipeline {
     }
   }
 }
-
