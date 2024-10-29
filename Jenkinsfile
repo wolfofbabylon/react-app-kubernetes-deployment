@@ -7,7 +7,7 @@ pipeline {
   agent any
 
   tools {
-    dockerTool 'myDocker' // Use dockerTool instead of docker to configure Docker
+    dockerTool 'myDocker' // Use dockerTool to configure Docker
   }
 
   stages {
@@ -20,6 +20,7 @@ pipeline {
     stage('Build Image') {
       steps {
         script {
+          // Build the Docker image
           dockerImage = docker.build(dockerimagename)
         }
       }
@@ -27,12 +28,13 @@ pipeline {
 
     stage('Push Image') {
       environment {
-        registryCredential = 'dockerhub-credentials'
+        registryCredential = 'dockerhub-credentials' // Make sure this is correct
       }
       steps {
         script {
+          // Push the image to Docker Hub
           docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-            dockerImage.push('latest')
+            dockerImage.push('latest') // This pushes the image tagged with 'latest'
           }
         }
       }
@@ -41,6 +43,7 @@ pipeline {
     stage('Deploy to Kubernetes') {
       steps {
         script {
+          // Deploy to Kubernetes using the specified kubeconfig
           kubernetesDeploy(kubeconfigId: 'kubeconfig-credentials', configs: ["deployment.yaml", "service.yaml"])
         }
       }
@@ -50,6 +53,7 @@ pipeline {
   post {
     always {
       script {
+        // Clean up the Docker image
         dockerImage?.with {
           println("Cleaning up Docker image")
           it.remove()
