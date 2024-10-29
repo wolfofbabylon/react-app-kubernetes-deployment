@@ -1,13 +1,13 @@
 pipeline {
   environment {
-    dockerimagename = "tanay598/react-app" // Updated repository name
+    dockerimagename = "tanay598/react-app" // Docker image name
     dockerImage = ""
   }
 
   agent any
 
   tools {
-    dockerTool 'myDocker' // Use dockerTool to configure Docker
+    dockerTool 'myDocker' // Configures Docker with 'myDocker' tool
   }
 
   stages {
@@ -28,13 +28,13 @@ pipeline {
 
     stage('Push Image') {
       environment {
-        registryCredential = 'dockerhub-credentials' // Ensure these are correct
+        registryCredential = 'dockerhub-credentials' // Docker Hub credentials
       }
       steps {
         script {
-          // Corrected registry URL for pushing
+          // Log in to Docker Hub and push the image
           docker.withRegistry('https://index.docker.io/v1/', registryCredential) {
-            dockerImage.push('latest') // This pushes the image tagged with 'latest'
+            dockerImage.push('latest') // Push the image tagged with 'latest'
           }
         }
       }
@@ -54,9 +54,9 @@ pipeline {
     always {
       script {
         // Clean up the Docker image
-        dockerImage?.with {
+        if (dockerImage) {
           println("Cleaning up Docker image")
-          it.remove()
+          docker.image(dockerimagename).remove() // Removes the Docker image by its name
         }
       }
       cleanWs() // Clean workspace after build
