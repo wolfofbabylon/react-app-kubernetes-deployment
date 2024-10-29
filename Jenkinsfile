@@ -23,7 +23,7 @@ pipeline {
                 script {
                     // Ensure that the Kubernetes plugin or CLI tool is used
                     // Here we use kubectl directly for deployment instead of kubernetesDeploy
-                    withKubeConfig([credentialsId: 'k8s-credentials']) {
+                    withKubeConfig([credentialsId: 'kubeconfig-credentials']) {
                         sh """
                             kubectl apply -f my-k8s-deployment.yaml
                             kubectl rollout status deployment/my-app
