@@ -28,12 +28,12 @@ pipeline {
 
     stage('Push Image') {
       environment {
-        registryCredential = 'dockerhub-credentials' // Make sure this is correct
+        registryCredential = 'dockerhub-credentials' // Ensure these are correct
       }
       steps {
         script {
-          // Push the image to Docker Hub
-          docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+          // Corrected registry URL for pushing
+          docker.withRegistry('https://index.docker.io/v1/', registryCredential) {
             dockerImage.push('latest') // This pushes the image tagged with 'latest'
           }
         }
