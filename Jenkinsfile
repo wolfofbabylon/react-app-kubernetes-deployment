@@ -1,6 +1,6 @@
 pipeline {
   environment {
-    dockerimagename = "bravinwasike/react-app"
+    dockerimagename = "tanay598/react-app" // Updated repository name
     dockerImage = ""
   }
 
